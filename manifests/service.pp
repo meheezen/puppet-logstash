@@ -92,7 +92,8 @@ class logstash::service {
       'windows': {
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir}":
           path => $::path,
-          unless => 'NSSM status logstash',
+          provider => powershell,
+          unless => 'if ((NSSM get logstash AppDirectory) -eq ("${logstash::home_dir}/bin")) { exit 0 } else { exit 1 }'
         } ~> Service['logstash']
         # Dummy exec for require dependencies
         exec { 'logstash-system-install':
