@@ -91,13 +91,15 @@ class logstash::service {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
         exec { "NSSM stop logstash":
-          path    => $::path,
-          onlyif  => 'NSSM status logstash'
+          path      => $::path,
+          provider  => powershell,
+          # Fix output encoding to prevent getting null byte character between each character of the output
+          onlyif    => "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if (((NSSM get logstash AppDirectory) -ne (${logstash::home_dir}/bin)) -and (NSSM status logstash)) { exit 0 } else { exit 1 }",
         } ->
         exec { "NSSM remove logstash confirm":
           path      => $::path,
           provider  => powershell,
-          onlyif    => '[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if (((NSSM get logstash AppDirectory) -ne ("${logstash::home_dir}/bin")) -and (NSSM status logstash)) { exit 0 } else { exit 1 }',
+          onlyif    => "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if (((NSSM get logstash AppDirectory) -ne (${logstash::home_dir}/bin)) -and (NSSM status logstash)) { exit 0 } else { exit 1 }",
         } ->
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir} --experimental-java-execution":
           path    => $::path,
