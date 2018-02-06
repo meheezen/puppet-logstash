@@ -97,7 +97,7 @@ class logstash::service {
         exec { "NSSM remove logstash confirm":
           path      => $::path,
           provider  => powershell,
-          onlyif    => 'if (((NSSM get logstash AppDirectory) -ne ("${logstash::home_dir}/bin")) -and ((NSSM status logstash) -notlike "*not exist*")) { exit 0 } else { exit 1 }',
+          onlyif    => 'if (((NSSM get logstash AppDirectory) -ne ("${logstash::home_dir}/bin")) -and (NSSM status logstash)) { exit 0 } else { exit 1 }',
         } ->
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir} --experimental-java-execution":
           path    => $::path,
