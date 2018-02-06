@@ -89,16 +89,14 @@ class logstash::service {
 
     case $::kernel {
       # XXX remove work-around when system-install supports windows service installation
-      'windows': {
-        
+      'windows': { 
         exec { "NSSM remove logstash":
-          provider => powershell,
-          onlyif => 'if ((NSSM get logstash AppDirectory) -eq ("${logstash::home_dir}/bin")) { exit 1 } else { exit 0 }'
+          provider  => powershell,
+          onlyif    => 'if ((NSSM get logstash AppDirectory) -eq ("${logstash::home_dir}/bin")) { exit 1 } else { exit 0 }',
         } ->
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir} --experimental-java-execution":
-          path => $::path,
-          provider => powershell,
-          unless => 'NSSM status logstash'
+          path    => $::path,
+          unless  => 'NSSM status logstash',
         } ~> Service['logstash']
         # Dummy exec for require dependencies
         exec { 'logstash-system-install':
