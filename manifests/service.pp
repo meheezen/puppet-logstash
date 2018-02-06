@@ -91,12 +91,13 @@ class logstash::service {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
         exec { "NSSM stop logstash":
-          onlyif => 'NSSM status logstash'
+          path    => $::path,
+          onlyif  => 'NSSM status logstash'
         } ->
         exec { "NSSM remove logstash confirm":
           path      => $::path,
           provider  => powershell,
-          onlyif    => 'if ((NSSM get logstash AppDirectory) -eq ("${logstash::home_dir}/bin")) { exit 1 } else { exit 0 }',
+          onlyif    => 'if (((NSSM get logstash AppDirectory) -eq ("${logstash::home_dir}/bin")) -and ((NSSM status logstash) -contains "*not exist*")) { exit 1 } else { exit 0 }',
         } ->
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir} --experimental-java-execution":
           path    => $::path,
