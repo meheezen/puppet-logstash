@@ -90,6 +90,9 @@ class logstash::service {
     case $::kernel {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
+        exec { "NSSM stop logstash":
+          onlyif => 'NSSM status logstash'
+        } ->
         exec { "NSSM remove logstash confirm":
           path      => $::path,
           provider  => powershell,
