@@ -87,6 +87,8 @@ class logstash::service {
       content => template('logstash/logstash.yml.erb'),
     }
 
+
+    $skip_service_reinstall_when = "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if ((((NSSM get logstash AppDirectory) -ne (${logstash::home_dir}/bin)) -or (NSSM get logstash AppParameters) -ne (--path.settings=${logstash::config_dir})) -and (NSSM status logstash)) { exit 0 } else { exit 1 }"
     case $::kernel {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
@@ -94,12 +96,12 @@ class logstash::service {
           path      => $::path,
           provider  => powershell,
           # Fix output encoding to prevent getting null byte character between each character of the output
-          onlyif    => "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if ((((NSSM get logstash AppDirectory) -ne (${logstash::home_dir}/bin)) -or (NSSM get logstash AppParameters) -ne (--path.settings=${logstash::config_dir})) -and (NSSM status logstash)) { exit 0 } else { exit 1 }",
+          onlyif    => $skip_service_reinstall_when,
         } ->
         exec { "NSSM remove logstash confirm":
           path      => $::path,
           provider  => powershell,
-          onlyif    => "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if ((((NSSM get logstash AppDirectory) -ne (${logstash::home_dir}/bin)) -or (NSSM get logstash AppParameters) -ne (--path.settings=${logstash::config_dir})) -and (NSSM status logstash)) { exit 0 } else { exit 1 }",
+          onlyif    => $skip_service_reinstall_when, 
         } ->
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir}":
           path    => $::path,
