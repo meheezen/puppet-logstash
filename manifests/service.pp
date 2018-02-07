@@ -90,10 +90,12 @@ class logstash::service {
     case $::kernel {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
-        exec { "NSSM stop logstash":
+        exec { "NSSM stop logstash ${logstash::params}":
+          command   => "NSSM stop logstash",
           path      => $::path,
           provider  => powershell,
           # Fix output encoding to prevent getting null byte character between each character of the output
+          # Reinstall the service if the version changed or if the parameters changed
           onlyif    => "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if ((((NSSM get logstash AppDirectory) -ne (${logstash::home_dir}/bin)) -or (NSSM get logstash AppParameters) -ne (${logstash::params})) -and (NSSM status logstash)) { exit 0 } else { exit 1 }",
         } ->
         exec { "NSSM remove logstash confirm":
