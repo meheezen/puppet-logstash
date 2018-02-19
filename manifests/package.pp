@@ -111,6 +111,9 @@ class logstash::package(
     }
     'windows': {
       if $logstash::ensure == 'present' {
+        file { 'c:/opt':
+          ensure => 'directory',
+        } ->
         archive {"C:\\Windows\\Temp\\logstash-${logstash::version}.zip":
           ensure       => present,
           source       => "${download_base_url}/logstash-${logstash::version}.zip",
