@@ -114,6 +114,7 @@ define logstash::plugin (
         command => "${exe} install ${plugin}",
         unless  => "${grep} ${name} Gemfile",
         creates => $creates,
+        path    => $::path,
       }
     }
 
@@ -123,6 +124,7 @@ define logstash::plugin (
         command => "${exe} install --version ${ensure} ${plugin}",
         unless  => "${grep} ${name} Gemfile | ${grep} ${ensure}",
         creates => $creates,
+        path    => $::path,
       }
     }
 
@@ -130,6 +132,7 @@ define logstash::plugin (
       exec { "remove-${name}":
         command => "${exe} remove ${name}",
         onlyif  => "${exe} list | grep -q ^${name}$",
+        path    => $::path,
       }
     }
 
