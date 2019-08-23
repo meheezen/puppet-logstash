@@ -93,18 +93,21 @@ class logstash::service {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
         exec { "NSSM stop logstash":
-          path      => $::path,
-          provider  => powershell,
+          path     => $::path,
+          provider => powershell,
+          returns  => ['0','1'],
           # Fix output encoding to prevent getting null byte character between each character of the output
-          onlyif    => $skip_service_reinstall_when,
+          onlyif   => $skip_service_reinstall_when,
         } ->
         exec { "NSSM remove logstash confirm":
-          path      => $::path,
-          provider  => powershell,
-          onlyif    => $skip_service_reinstall_when, 
+          path     => $::path,
+          provider => powershell,
+          returns  => ['0','1'],
+          onlyif   => $skip_service_reinstall_when, 
         } ->
         exec { "NSSM install logstash ${logstash::home_dir}/bin/logstash.bat --path.settings=${logstash::config_dir}":
           path    => $::path,
+          returns => ['0','1'],
           unless  => 'NSSM status logstash',
         } ~> Service['logstash']
         # Dummy exec for require dependencies
