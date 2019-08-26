@@ -88,7 +88,7 @@ class logstash::service {
     }
 
 
-    $skip_service_reinstall_when = "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if ((((NSSM get logstash AppDirectory) -ne (\"${logstash::home_dir}/bin)\" ) -or (NSSM get logstash AppParameters) -ne (\"--path.settings=${logstash::config_dir}\")) -and (NSSM status logstash)) { exit 0 } else { exit 2 }"
+    $skip_service_reinstall_when = "[Console]::OutputEncoding = [System.Text.Encoding]::Unicode; if (((NSSM get logstash AppDirectory) -ne (\"${logstash::home_dir}/bin)\" ) -or (NSSM get logstash AppParameters) -ne (\"--path.settings=${logstash::config_dir}\")) -and (NSSM status logstash)) { exit 0 } else { exit 2 }"
     case $::kernel {
       # XXX remove work-around when system-install supports windows service installation
       'windows': { 
